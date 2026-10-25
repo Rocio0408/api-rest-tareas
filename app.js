@@ -31,8 +31,21 @@ app.get("/", (req, res) => {
 });
 
 // Conecta la base de datos y después inicia el servidor.
-dbconnect().then(() => {
-  app.listen(PORT, () => {
-    console.log(`Servidor funcionando en http://localhost:${PORT}`);
+
+dbconnect()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(
+        `Servidor funcionando en http://localhost:${PORT}`
+      );
+    });
+  })
+  .catch((error) => {
+    console.error(
+      "No se pudo iniciar la API:",
+      error.message
+    );
+
+    process.exit(1);
   });
-});
+

@@ -169,19 +169,33 @@ router.get("/tareas/proximas-vencer/:dias", async (req, res) => {
 
     if (!Number.isInteger(dias) || dias <= 0) {
       return res.status(400).json({
-        mensaje: "La cantidad de días debe ser un número entero mayor que cero",
+        mensaje:
+          "La cantidad de días debe ser un número entero mayor que cero",
       });
     }
 
-    const fechaActual = new Date();
+    // Obtenemos la fecha calendario actual.
+    const ahora = new Date();
 
-    const fechaFinal = new Date();
-    fechaFinal.setDate(fechaFinal.getDate() + dias);
+    // Usamos los componentes de la fecha local y construimos
+    // los límites a medianoche UTC para comparar fechas sin hora.
+    const fechaInicio = new Date(
+      Date.UTC(
+        ahora.getFullYear(),
+        ahora.getMonth(),
+        ahora.getDate(),
+      ),
+    );
+
+    // Incluimos el día de hoy y todos los días hasta el límite,
+    // inclusive. El límite superior de la consulta es exclusivo.
+    const fechaFin = new Date(fechaInicio);
+    fechaFin.setUTCDate(fechaFin.getUTCDate() + dias + 1);
 
     const tareas = await Tarea.find({
       fechaLimite: {
-        $gte: fechaActual,
-        $lte: fechaFinal,
+        $gte: fechaInicio,
+        $lt: fechaFin,
       },
     });
 
